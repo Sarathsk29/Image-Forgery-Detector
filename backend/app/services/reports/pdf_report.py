@@ -22,19 +22,34 @@ def generate_pdf_report(case: Case, evidence: Evidence, job: AnalysisJob, result
     pdf.setFont("Helvetica-Bold", 18)
     pdf.drawString(40, height - 50, "Digital Forgery Analysis Report")
 
+    # Prominent verdict box
+    verdict = result.forgery_status.value
+    verdict_color = {
+        "authentic": colors.HexColor("#1a7f37"),
+        "suspicious": colors.HexColor("#d97706"),
+        "tampered": colors.HexColor("#b91c1c"),
+    }.get(verdict, colors.HexColor("#334155"))
+
+    pdf.setFillColor(verdict_color)
+    pdf.rect(40, height - 115, 220, 45, fill=1, stroke=0)
+    pdf.setFillColor(colors.white)
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, height - 95, f"Verdict: {verdict.replace('_', ' ').title()}")
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(50, height - 110, f"Confidence: {result.confidence_score:.2f}")
+
+    pdf.setFillColor(colors.HexColor("#e7eef7"))
     pdf.setFont("Helvetica", 10)
     lines = [
         f"Case ID: {case.case_id}",
         f"Evidence: {evidence.original_filename}",
         f"Analysis Type: {job.analysis_type.value}",
-        f"Forgery Status: {result.forgery_status.value.title()}",
-        f"Confidence Score: {result.confidence_score:.2f}",
         f"Generated: {result.created_at.isoformat()}",
         f"Methods: {', '.join(result.methods)}",
         f"Summary: {result.summary}",
     ]
 
-    current_y = height - 85
+    current_y = height - 130
     for line in lines:
         for wrapped in _wrap_text(line, 95):
             pdf.drawString(40, current_y, wrapped)
