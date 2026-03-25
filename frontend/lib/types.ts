@@ -6,6 +6,7 @@ export type Evidence = {
   storage_url: string;
   file_hash: string;
   uploaded_at: string;
+  latest_result?: AnalysisResult | null;
 };
 
 export type AnalysisJob = {

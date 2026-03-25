@@ -23,6 +23,7 @@ class EvidenceRead(BaseModel):
     storage_url: str
     file_hash: str
     uploaded_at: datetime
+    latest_result: "AnalysisResultRead" | None = None
 
 
 class CreateCaseResponse(BaseModel):

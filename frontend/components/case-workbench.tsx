@@ -250,6 +250,17 @@ function EvidenceCard({
         <div className="flex flex-wrap items-center gap-3">
           <h3 className="text-lg font-semibold text-text">{evidence.original_filename}</h3>
           <span className="rounded-full border border-border px-3 py-1 font-mono text-xs uppercase tracking-[0.24em] text-muted">{evidence.mime_type}</span>
+          {evidence.latest_result ? (
+            <span
+              className={`ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${{
+                authentic: "bg-success/10 border-success text-success",
+                suspicious: "bg-warning/10 border-warning text-warning",
+                tampered: "bg-danger/10 border-danger text-danger"
+              }[evidence.latest_result.forgery_status as string] ?? "bg-panel text-muted"}`}
+            >
+              {evidence.latest_result.forgery_status.replaceAll("_", " ")} • {Math.round(evidence.latest_result.confidence_score * 100)}%
+            </span>
+          ) : null}
         </div>
         <div className="mt-3 grid gap-2 text-sm text-muted md:grid-cols-2">
           <p>
