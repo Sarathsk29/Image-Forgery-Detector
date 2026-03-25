@@ -33,6 +33,7 @@ export type AnalysisResult = {
   methods: string[];
   findings: Record<string, unknown>;
   artifacts: Artifact[];
+  report?: Report | null;
 };
 
 export type Report = {

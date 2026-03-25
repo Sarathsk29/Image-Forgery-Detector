@@ -29,7 +29,19 @@ def open_case_route(payload: OpenCaseRequest, db: Session = Depends(get_db)) -> 
             latest_job = sorted(jobs, key=lambda j: j.created_at, reverse=True)[0]
         ev_data = EvidenceRead.model_validate(ev).model_dump()
         if latest_job and latest_job.result:
-            ev_data["latest_result"] = AnalysisResultRead.model_validate(latest_job.result).model_dump()
+            res = latest_job.result
+            report = None
+            if getattr(res, "report", None):
+                report = {"url": res.report.public_url, "generated_at": res.report.generated_at}
+            ev_data["latest_result"] = {
+                "forgery_status": res.forgery_status.value,
+                "confidence_score": float(res.confidence_score),
+                "summary": res.summary,
+                "methods": list(res.methods or []),
+                "findings": dict(res.findings or {}),
+                "artifacts": [{"label": a.get("label"), "url": a.get("url")} for a in (res.artifact_urls or [])],
+                "report": report,
+            }
         else:
             ev_data["latest_result"] = None
         evidence_items.append(ev_data)
@@ -58,7 +70,19 @@ def get_case_route(case_id: str, access_key: str, db: Session = Depends(get_db))
             latest_job = sorted(jobs, key=lambda j: j.created_at, reverse=True)[0]
         ev_data = EvidenceRead.model_validate(ev).model_dump()
         if latest_job and latest_job.result:
-            ev_data["latest_result"] = AnalysisResultRead.model_validate(latest_job.result).model_dump()
+            res = latest_job.result
+            report = None
+            if getattr(res, "report", None):
+                report = {"url": res.report.public_url, "generated_at": res.report.generated_at}
+            ev_data["latest_result"] = {
+                "forgery_status": res.forgery_status.value,
+                "confidence_score": float(res.confidence_score),
+                "summary": res.summary,
+                "methods": list(res.methods or []),
+                "findings": dict(res.findings or {}),
+                "artifacts": [{"label": a.get("label"), "url": a.get("url")} for a in (res.artifact_urls or [])],
+                "report": report,
+            }
         else:
             ev_data["latest_result"] = None
         evidence_items.append(ev_data)

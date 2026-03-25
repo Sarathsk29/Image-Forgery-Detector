@@ -35,9 +35,12 @@ class AnalysisResultRead(BaseModel):
     methods: list[str]
     findings: dict
     artifacts: list[ArtifactRead]
+    report: "ReportRead" | None = None
 
 
 class ReportRead(BaseModel):
     url: str
     generated_at: datetime
+
+AnalysisResultRead.model_rebuild()
 

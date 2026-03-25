@@ -284,6 +284,13 @@ function EvidenceCard({
             </Button>
           ))}
         </div>
+        <div className="mt-3">
+          {evidence.latest_result?.report?.url ? (
+            <a href={evidence.latest_result.report.url} target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost">Open Report</Button>
+            </a>
+          ) : null}
+        </div>
       </div>
     </article>
   );
