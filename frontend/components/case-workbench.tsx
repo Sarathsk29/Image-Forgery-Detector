@@ -232,9 +232,14 @@ function EvidenceCard({
   const isImage = evidence.mime_type.startsWith("image/");
   return (
     <article className="grid gap-4 rounded-2xl border border-border bg-panel/70 p-4 lg:grid-cols-[220px_1fr]">
-      <div className="overflow-hidden rounded-xl border border-border bg-background/60">
+      <div className="overflow-hidden rounded-xl border border-border bg-background/60 h-56 flex items-center justify-center">
         {isImage ? (
-          <img alt={evidence.original_filename} className="h-44 w-full object-cover" src={buildAssetUrl(evidence.storage_url)} />
+          <img
+            alt={evidence.original_filename}
+            src={buildAssetUrl(evidence.storage_url)}
+            className="max-h-full max-w-full object-contain"
+            style={{ display: "block" }}
+          />
         ) : (
           <div className="flex h-44 items-center justify-center">
             <FileText className="h-12 w-12 text-accent" />
