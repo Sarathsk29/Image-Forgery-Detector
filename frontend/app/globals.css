@@ -36,3 +36,9 @@ a {
   box-sizing: border-box;
 }
 
+/* Hide Next.js dev tools logo in development */
+#next-logo,
+[data-nextjs-dev-tools-button] {
+  display: none !important;
+}
+
