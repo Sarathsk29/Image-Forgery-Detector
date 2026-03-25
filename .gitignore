@@ -1,0 +1,16 @@
+node_modules/
+.next/
+dist/
+coverage/
+frontend/.next/
+frontend/node_modules/
+backend/.pytest_cache/
+backend/__pycache__/
+backend/.mypy_cache/
+backend/uploads/
+backend/artifacts/
+backend/.venv/
+*.pyc
+.env
+.env.local
+.DS_Store
