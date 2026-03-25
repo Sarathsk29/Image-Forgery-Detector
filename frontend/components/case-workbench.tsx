@@ -181,6 +181,13 @@ export function CaseWorkbench({ caseId, accessKey }: { caseId: string; accessKey
         </SectionCard>
 
         <SectionCard title="Evidence Log" eyebrow="Case History">
+          <div className="mb-4 flex items-center gap-3 text-sm">
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-success/10 border border-success text-success">Authentic</span>
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-warning/10 border border-warning text-warning">Suspicious</span>
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-danger/10 border border-danger text-danger">Tampered</span>
+            <p className="ml-3 text-xs text-muted">Legend: color indicates the most recent analysis verdict for each evidence.</p>
+          </div>
+
           {sortedEvidence.length === 0 ? (
             <EmptyState label="No evidence uploaded yet." />
           ) : (
