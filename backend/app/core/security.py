@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from passlib.context import CryptContext
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 
 def generate_case_id() -> str:
@@ -22,11 +22,18 @@ def generate_access_key() -> str:
 
 
 def hash_access_key(access_key: str) -> str:
-    return pwd_context.hash(access_key)
+    # bcrypt has a 72-byte input limit; truncate UTF-8 bytes to avoid errors
+    b = access_key.encode("utf-8")
+    if len(b) > 72:
+        b = b[:72]
+    return pwd_context.hash(b)
 
 
 def verify_access_key(access_key: str, hashed_access_key: str) -> bool:
-    return pwd_context.verify(access_key, hashed_access_key)
+    b = access_key.encode("utf-8")
+    if len(b) > 72:
+        b = b[:72]
+    return pwd_context.verify(b, hashed_access_key)
 
 
 def sha256_bytes(data: bytes) -> str:
