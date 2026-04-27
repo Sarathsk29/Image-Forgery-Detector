@@ -21,7 +21,9 @@ def perform_ela_on_pil(case_id: str, image: Image.Image, base_name: str, label: 
     jpeg_buffer.seek(0)
     recompressed = Image.open(jpeg_buffer).convert("RGB")
     diff = ImageChops.difference(image, recompressed)
-    score = clamp_score(float(np.asarray(diff).mean() / 255.0))
+    diff_arr = np.asarray(diff).astype(np.float32)
+    ela_gap = np.percentile(diff_arr, 99.5) - np.median(diff_arr)
+    score = clamp_score(float(ela_gap) / 10.0)
 
     extrema = diff.getextrema()
     max_diff = max(channel[1] for channel in extrema) or 1

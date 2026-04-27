@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -35,7 +38,7 @@ class AnalysisResultRead(BaseModel):
     methods: list[str]
     findings: dict
     artifacts: list[ArtifactRead]
-    report: "ReportRead" | None = None
+    report: Optional["ReportRead"] = None
 
 
 class ReportRead(BaseModel):

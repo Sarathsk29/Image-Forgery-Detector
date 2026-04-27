@@ -37,7 +37,7 @@ def analyze_document_forgery(case_id: str, file_path: str, filename: str) -> dic
             text_info = page.get_text("dict")
             fonts = [span.get("size", 0) for block in text_info.get("blocks", []) for line in block.get("lines", []) for span in line.get("spans", []) if span.get("size")]
             font_outlier_ratio = _font_outlier_ratio(fonts)
-            ocr = _ocr_analysis(image, case_id, f"{Path(filename).stem}-page-{page_index + 1}")
+            ocr = _ocr_analysis(image, case_id, f"{Path(filename).stem}-page-{page_index + 1}", label=f"Page {page_index + 1} OCR anomaly overlay")
             ela = perform_ela_on_pil(case_id, image, f"{Path(filename).stem}-page-{page_index + 1}", label=f"Page {page_index + 1} ELA")
             page_score = clamp_score(0.45 * ela["score"] + 0.25 * font_outlier_ratio + 0.3 * ocr["low_confidence_ratio"])
             scores.append(page_score)
@@ -104,7 +104,7 @@ def _font_outlier_ratio(font_sizes: list[float]) -> float:
     return clamp_score(len(outliers) / len(font_sizes))
 
 
-def _ocr_analysis(image: Image.Image, case_id: str, base_name: str) -> dict:
+def _ocr_analysis(image: Image.Image, case_id: str, base_name: str, label: str = "OCR anomaly overlay") -> dict:
     settings = get_settings()
     if settings.tesseract_cmd:
         pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
@@ -138,7 +138,7 @@ def _ocr_analysis(image: Image.Image, case_id: str, base_name: str) -> dict:
     if boxes:
         buffer = BytesIO()
         overlay.save(buffer, "PNG")
-        stored = get_storage_service().save_artifact(case_id, f"{base_name}-ocr-hotspots.png", buffer.getvalue(), "image/png", label="OCR anomaly overlay")
+        stored = get_storage_service().save_artifact(case_id, f"{base_name}-ocr-hotspots.png", buffer.getvalue(), "image/png", label=label)
         artifact = {"label": stored.label, "url": stored.public_url, "local_path": stored.local_path}
     ratio = clamp_score(low / max(total, 1))
     return {"low_confidence_ratio": ratio, "boxes": boxes, "artifact": artifact}

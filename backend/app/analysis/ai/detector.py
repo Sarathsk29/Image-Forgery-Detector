@@ -30,10 +30,10 @@ def analyze_ai_edited_image(case_id: str, image_path: str) -> dict:
         for x in range(0, residual.shape[1] - block_size + 1, block_size):
             block = residual[y : y + block_size, x : x + block_size]
             block_variances.append(float(np.var(block)))
-    variance_std = float(np.std(block_variances) / 255.0) if block_variances else 0.0
+    variance_std = float(np.std(block_variances) / 50.0) if block_variances else 0.0
 
-    vertical_boundaries = np.abs(np.diff(gray[:, 7::8].astype(np.float32), axis=1)).mean() / 255.0 if gray.shape[1] > 16 else 0.0
-    horizontal_boundaries = np.abs(np.diff(gray[7::8, :].astype(np.float32), axis=0)).mean() / 255.0 if gray.shape[0] > 16 else 0.0
+    vertical_boundaries = np.abs(np.diff(gray[:, 7::8].astype(np.float32), axis=1)).mean() / 40.0 if gray.shape[1] > 16 else 0.0
+    horizontal_boundaries = np.abs(np.diff(gray[7::8, :].astype(np.float32), axis=0)).mean() / 40.0 if gray.shape[0] > 16 else 0.0
     compression_score = float((vertical_boundaries + horizontal_boundaries) / 2.0)
 
     heatmap_base = cv2.normalize(residual, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
@@ -48,7 +48,7 @@ def analyze_ai_edited_image(case_id: str, image_path: str) -> dict:
 
     model_score = _optional_model_score(image_path)
     methods = ["ELA", "Edge discontinuity analysis", "Noise residual analysis", "Compression artifact analysis"]
-    weighted = 0.32 * ela["score"] + 0.22 * min(edge_ratio * 4.0, 1.0) + 0.24 * min(variance_std * 6.0, 1.0) + 0.22 * min(compression_score * 10.0, 1.0)
+    weighted = 0.35 * ela["score"] + 0.15 * min(edge_ratio * 5.0, 1.0) + 0.35 * min(variance_std * 3.0, 1.0) + 0.15 * min(compression_score * 3.0, 1.0)
     if model_score is not None:
         weighted = (weighted * 0.7) + (model_score * 0.3)
         methods.append("Optional pretrained classifier")

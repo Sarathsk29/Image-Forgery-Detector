@@ -119,12 +119,45 @@ export function ReportView({ caseId, jobId, accessKey }: { caseId: string; jobId
           <dl className="grid gap-3">
             {Object.entries(result.findings)
               .filter(([key]) => !["artifact_manifest", "conclusion", "regions", "page_findings", "suspicious_boxes"].includes(key))
-              .map(([key, value]) => (
-                <div key={key} className="rounded-xl border border-border bg-panel/50 p-3">
-                  <dt className="font-mono text-xs uppercase tracking-[0.25em] text-accent/80">{key.replaceAll("_", " ")}</dt>
-                  <dd className="mt-2 text-sm leading-6 text-muted">{typeof value === "string" ? value : JSON.stringify(value)}</dd>
-                </div>
-              ))}
+              .map(([key, value]) => {
+                const isArray = Array.isArray(value);
+                const isObject = value !== null && typeof value === "object" && !isArray;
+                const isEmptyArray = isArray && value.length === 0;
+
+                return (
+                  <div key={key} className="rounded-xl border border-border bg-panel/50 p-4">
+                    <dt className="font-mono text-xs uppercase tracking-[0.25em] text-accent/80 mb-2">
+                      {key.replaceAll("_", " ")}
+                    </dt>
+                    <dd className="text-sm leading-6 text-muted">
+                      {typeof value === "string" ? (
+                        <p>{value}</p>
+                      ) : isEmptyArray ? (
+                        <p className="text-muted/50 italic">None found</p>
+                      ) : isArray ? (
+                        <ul className="list-disc list-inside space-y-1">
+                          {value.map((item: any, i: number) => (
+                            <li key={i} className="text-text">{String(item)}</li>
+                          ))}
+                        </ul>
+                      ) : isObject ? (
+                        <div className="mt-2 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+                          {Object.entries(value).map(([subKey, subVal]) => (
+                            <div key={subKey} className="flex flex-col border-b border-border/40 pb-1">
+                              <span className="text-[11px] uppercase tracking-wider text-muted/70">{subKey.replaceAll("_", " ")}</span>
+                              <span className="mt-0.5 truncate font-medium text-text" title={String(subVal)}>
+                                {subVal !== null && subVal !== "" ? String(subVal) : <span className="text-muted/40 italic">empty</span>}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p>{String(value)}</p>
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
           </dl>
         </SectionCard>
       </div>
@@ -147,18 +180,67 @@ export function ReportView({ caseId, jobId, accessKey }: { caseId: string; jobId
       </SectionCard>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        {"regions" in result.findings ? (
-          <SectionCard title="Localized Regions" eyebrow="Spatial Clues">
-            <pre className="overflow-x-auto rounded-xl border border-border bg-panel/60 p-4 text-xs leading-6 text-muted">
-              {JSON.stringify(result.findings.regions, null, 2)}
-            </pre>
+        {"regions" in result.findings && (result.findings.regions as any[]).length > 0 ? (
+          <SectionCard title="Identified Copy-Move Clones" eyebrow="Spatial Clues">
+             <div className="grid gap-3">
+              {(result.findings.regions as any[]).map((region, idx) => (
+                <div key={idx} className="flex flex-col gap-1 rounded-xl border border-border bg-panel/50 p-4 text-sm leading-6 text-muted">
+                  <p>
+                    <span className="font-semibold text-accent">Match Pair #{idx + 1}:</span> A nearly identical image patch was duplicated.
+                  </p>
+                  <div className="flex flex-wrap items-center text-xs font-mono gap-3 mt-1 bg-background p-2 px-3 rounded border border-border">
+                    <span>Source: ({region.from?.x ?? "N/A"}, {region.from?.y ?? "N/A"})</span>
+                    <span className="text-muted">→</span>
+                    <span>Clone: ({region.to?.x ?? "N/A"}, {region.to?.y ?? "N/A"})</span>
+                    <span className="ml-auto text-warning font-semibold">Dist: {region.distance}px</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </SectionCard>
         ) : null}
         {"page_findings" in result.findings ? (
           <SectionCard title="Page Analysis" eyebrow="Document Review">
-            <pre className="overflow-x-auto rounded-xl border border-border bg-panel/60 p-4 text-xs leading-6 text-muted">
-              {JSON.stringify(result.findings.page_findings, null, 2)}
-            </pre>
+            <div className="grid gap-4">
+              {(result.findings.page_findings as any[]).map((pf, idx) => {
+                const elaPerc = Math.round((pf.ela_score || 0) * 100);
+                const lcrPerc = Math.round((pf.low_confidence_ratio || 0) * 100);
+                const curScorePerc = Math.round((pf.page_score || 0) * 100);
+                const boxesCnt = pf.suspicious_boxes ? pf.suspicious_boxes.length : 0;
+                
+                return (
+                  <div key={idx} className="rounded-xl border border-border bg-panel/50 p-4">
+                    <h4 className="text-sm font-semibold text-text mb-3">Page {pf.page || idx + 1} Overview (Anomaly Score: {curScorePerc}%)</h4>
+                    <ul className="list-disc list-inside text-sm leading-6 text-muted space-y-1">
+                      <li>Error Level Analysis (ELA) indicated a {elaPerc}% probability of anomalous regions.</li>
+                      {pf.font_outlier_ratio !== undefined && (
+                        <li>Font variance analysis detected {Math.round(pf.font_outlier_ratio * 100)}% of text elements with outlier font sizes.</li>
+                      )}
+                      <li>OCR confidence was unusually low for {lcrPerc}% of the detected text.</li>
+                      {boxesCnt > 0 && (
+                        <li>
+                          Located {boxesCnt} specific bounding box(es) with suspicious or severely degraded text confidence:
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {pf.suspicious_boxes.map((box: any, bIdx: number) => (
+                              <span key={bIdx} className="rounded border border-border bg-background px-2 py-1 text-xs">
+                                <span className="font-mono text-accent">"{box.text?.trim() || "<empty>"}"</span> <span className="text-muted ml-1">(Conf: {box.confidence}%)</span>
+                              </span>
+                            ))}
+                          </div>
+                        </li>
+                      )}
+                      <li className="mt-2 list-none">
+                        {curScorePerc >= 40 ? (
+                          <span className="text-warning">⚠️ Overall, this page shows significant signs of potential tampering or heavy degradation.</span>
+                        ) : (
+                          <span className="text-success">✓ This page appears largely consistent with no dominant red flags.</span>
+                        )}
+                      </li>
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
           </SectionCard>
         ) : null}
       </div>

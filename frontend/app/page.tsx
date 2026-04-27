@@ -1,6 +1,6 @@
-import { LandingShell } from "@/components/landing-shell";
+import { CaseWorkbench } from "@/components/case-workbench";
 
 export default function HomePage() {
-  return <LandingShell />;
+  return <CaseWorkbench />;
 }
 

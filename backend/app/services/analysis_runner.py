@@ -36,7 +36,7 @@ def run_analysis_job(db: Session, job: AnalysisJob) -> None:
             summary=payload["summary"],
             methods=payload["methods"],
             findings=payload["findings"],
-            artifact_urls=[artifact["url"] for artifact in payload["artifacts"]],
+            artifact_urls=[{"label": artifact.get("label", "Artifact"), "url": artifact.get("url", artifact)} if isinstance(artifact, dict) else {"label": "Artifact", "url": artifact} for artifact in payload.get("artifacts", [])],
         )
         db.add(result)
         db.commit()

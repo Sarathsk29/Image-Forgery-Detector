@@ -2,6 +2,13 @@
 
 Case-based forensic web application for detecting image forgery, AI-edited images, and document tampering using hybrid techniques such as SIFT, ELA, OCR, metadata inspection, and heuristic artifact analysis.
 
+## Key Features
+
+- **Multi-Modal Detection**: Supports image forgery (Copy-Move, ELA), document tampering (OCR, metadata), and AI-generated image detection.
+- **Streamlined Workflow**: Intuitive multi-step UI separating case creation, evidence upload, analysis, and reporting.
+- **Interactive Dashboards**: Clear visual evidence log with color-coded verdict badges and confidence score tooltips.
+- **Comprehensive Reporting**: Automatically generated, downloadable PDF reports summarizing findings and visual artifacts.
+
 ## Stack
 
 - Frontend: Next.js, Tailwind CSS, shadcn-style component structure
@@ -13,19 +20,17 @@ Case-based forensic web application for detecting image forgery, AI-edited image
 
 ## Monorepo Structure
 
-- `frontend/` Next.js investigation interface
+- `frontend/` Next.js multi-page investigation interface (Dashboard, Evidence Upload, Analysis, Reports)
 - `backend/` FastAPI API, forensic pipelines, storage adapters, report generation
 - `docs/` deployment and operations notes
 
 ## Core Workflow
 
-1. Create a case and receive a `Case ID` plus `access key`
-2. Reopen a case using both values
-3. Upload one or more evidence files
-4. Start image forgery, document forgery, or AI-edited analysis
-5. Poll asynchronous job status
-6. Review structured findings and visual artifacts
-7. Download the generated PDF forensic report
+1. **Case Management**: Create a new case or reopen an existing one using a securely generated `Case ID` and `access key`.
+2. **Evidence Upload**: Use the dedicated upload page to securely submit one or more images or documents.
+3. **Forensic Analysis Dashboard**: Navigate to the analysis page to run specific algorithms (image forgery, document forgery, or AI-edited detection).
+4. **Interactive Review**: Review structured findings, visual artifacts, and confidence-scored verdict badges directly within the UI.
+5. **Reporting**: Generate, view, and download detailed PDF forensic reports highlighting forgery verdicts.
 
 ## Local Development
 

@@ -39,7 +39,7 @@ def open_case_route(payload: OpenCaseRequest, db: Session = Depends(get_db)) -> 
                 "summary": res.summary,
                 "methods": list(res.methods or []),
                 "findings": dict(res.findings or {}),
-                "artifacts": [{"label": a.get("label"), "url": a.get("url")} for a in (res.artifact_urls or [])],
+                "artifacts": [{"label": a.get("label", "Artifact") if isinstance(a, dict) else "Artifact", "url": a.get("url", a) if isinstance(a, dict) else a} for a in (res.artifact_urls or [])],
                 "report": report,
             }
         else:
@@ -80,7 +80,7 @@ def get_case_route(case_id: str, access_key: str, db: Session = Depends(get_db))
                 "summary": res.summary,
                 "methods": list(res.methods or []),
                 "findings": dict(res.findings or {}),
-                "artifacts": [{"label": a.get("label"), "url": a.get("url")} for a in (res.artifact_urls or [])],
+                "artifacts": [{"label": a.get("label", "Artifact") if isinstance(a, dict) else "Artifact", "url": a.get("url", a) if isinstance(a, dict) else a} for a in (res.artifact_urls or [])],
                 "report": report,
             }
         else:

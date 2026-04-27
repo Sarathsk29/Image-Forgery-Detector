@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -23,7 +26,7 @@ class EvidenceRead(BaseModel):
     storage_url: str
     file_hash: str
     uploaded_at: datetime
-    latest_result: "AnalysisResultRead" | None = None
+    latest_result: Optional["AnalysisResultRead"] = None
 
 
 class CreateCaseResponse(BaseModel):
@@ -48,7 +51,8 @@ class CaseDetail(CaseSummary):
     analysis_jobs: list["AnalysisJobRead"]
 
 
-from app.schemas.analysis import AnalysisJobRead  # noqa: E402
+from app.schemas.analysis import AnalysisJobRead, AnalysisResultRead  # noqa: E402
 
+EvidenceRead.model_rebuild()
 CaseDetail.model_rebuild()
 
