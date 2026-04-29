@@ -1,4 +1,4 @@
-# Multi-Modal Digital Forgery Detection System (IDF-CODEX)
+# Multi-Modal Digital Forgery Detection System 
 
 > A comprehensive case-based forensic web application for detecting image forgery, AI-edited images, and document tampering using hybrid techniques such as SIFT, ELA, OCR, metadata inspection, and heuristic artifact analysis.
 
@@ -19,7 +19,7 @@
 
 ## Introduction
 
-**IDF-CODEX** (Image and Document Forgery Detection - CODEX) is an advanced forensic platform designed to detect and analyze digital forgeries across multiple media types. The system employs cutting-edge computer vision, image processing, and machine learning techniques to identify copy-move forgeries, AI-generated content, document tampering, and metadata anomalies.
+(Image and Document Forgery Detection - CODEX) is an advanced forensic platform designed to detect and analyze digital forgeries across multiple media types. The system employs cutting-edge computer vision, image processing, and machine learning techniques to identify copy-move forgeries, AI-generated content, document tampering, and metadata anomalies.
 
 ### Project Vision
 
